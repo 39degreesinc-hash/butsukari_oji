@@ -8,38 +8,54 @@ const ENEMY_WIDTH = 40;
 const ENEMY_HEIGHT = 40;
 const INITIAL_ENEMY_SPEED = 3.5;
 const INITIAL_SPAWN_INTERVAL = 1400; // ms
-const SPEED_INCREMENT = 0.0008;      // フレームごとの速度加算
-const SPAWN_DECREMENT = 0.12;        // 秒ごとのスポーン間隔短縮(ms)
+const SPEED_INCREMENT = 0.0008;
+const SPAWN_DECREMENT = 0.12;
 const MIN_SPAWN_INTERVAL = 400;
+const CLEAR_TIME = 60; // 秒
+
+const ENEMY_EMOJIS = ['👴', '👨', '👨‍🦰', '👨‍🦳'];
 
 const GAME_OVER_MESSAGES = [
   "はい、今日も理不尽",
-  "避けたのに来たよね？",
+  "避けたのに来るタイプ",
   "これは不可避",
-  "ぶつかり専門学校でも出たん？",
-  "明日はあなたがぶつかる番だ",
-  "はい、あなたが今日の被害者です",
+  "ぶつかりスキル高すぎ",
+  "通勤ストレスMAX",
+  "今日の被害者です",
   "なぜかあなたにだけ当たりに来る",
-  "魂のぶつかり合い"
-  "この衝突が地球の始まりだと言われている"
+  "歩いてるだけでイベント発生"
+];
+
+const CLEAR_MESSAGES = [
+  "今日からあなたもぶつかりおじさん",
+  "サバンナ出身ですか？",
+  "反射神経おばけ",
+  "もはや人間じゃない",
+  "おじさんたちが白旗を揚げました",
+  "伝説の通勤戦士爆誕",
+  "あなたを避けるおじさんは存在しない",
+  "ラスボスはあなたでした"
 ];
 
 // ---- 要素取得 ----
 const screenStart    = document.getElementById('screen-start');
 const screenGame     = document.getElementById('screen-game');
 const screenGameover = document.getElementById('screen-gameover');
+const screenClear    = document.getElementById('screen-clear');
 const gameArea       = document.getElementById('game-area');
 const playerEl       = document.getElementById('player');
 const scoreEl        = document.getElementById('score');
 const finalScoreEl   = document.getElementById('final-score');
 const randomMsgEl    = document.getElementById('random-message');
+const clearMsgEl     = document.getElementById('clear-message');
 const btnStart       = document.getElementById('btn-start');
 const btnRestart     = document.getElementById('btn-restart');
+const btnClearRestart = document.getElementById('btn-clear-restart');
 const touchLeft      = document.getElementById('touch-left');
 const touchRight     = document.getElementById('touch-right');
 
 // ---- ゲーム状態 ----
-let state = 'start'; // 'start' | 'playing' | 'gameover'
+let state = 'start'; // 'start' | 'playing' | 'gameover' | 'clear'
 let animFrameId = null;
 
 let player = { x: 0, y: 0 };
@@ -51,16 +67,22 @@ let spawnInterval = INITIAL_SPAWN_INTERVAL;
 let enemySpeed = INITIAL_ENEMY_SPEED;
 
 let keys = { left: false, right: false };
-let touchDir = 0; // -1 | 0 | 1
+let touchDir = 0;
+
+// ---- ランダム選択ヘルパー ----
+function pickRandom(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
 
 // ---- 画面切替 ----
 function showScreen(name) {
-  screenStart.classList.remove('active');
-  screenGame.classList.remove('active');
-  screenGameover.classList.remove('active');
+  [screenStart, screenGame, screenGameover, screenClear].forEach(s =>
+    s.classList.remove('active')
+  );
   if (name === 'start')    screenStart.classList.add('active');
   if (name === 'playing')  screenGame.classList.add('active');
   if (name === 'gameover') screenGameover.classList.add('active');
+  if (name === 'clear')    screenClear.classList.add('active');
 }
 
 // ---- ゲーム初期化 ----
@@ -77,7 +99,6 @@ function initGame() {
 
   const areaW = gameArea.offsetWidth;
   player.x = areaW / 2;
-  player.y = gameArea.offsetHeight - 40 - PLAYER_HEIGHT;
   updatePlayerPos();
   scoreEl.textContent = '0';
 }
@@ -85,7 +106,6 @@ function initGame() {
 // ---- プレイヤー位置更新 ----
 function updatePlayerPos() {
   playerEl.style.left = player.x + 'px';
-  playerEl.style.bottom = '40px';
 }
 
 // ---- 敵スポーン ----
@@ -96,7 +116,7 @@ function spawnEnemy() {
 
   const el = document.createElement('div');
   el.className = 'enemy';
-  el.textContent = '👴';
+  el.textContent = pickRandom(ENEMY_EMOJIS);
   gameArea.appendChild(el);
 
   enemies.push({ x, y: -ENEMY_HEIGHT, el });
@@ -132,13 +152,20 @@ function gameLoop(timestamp) {
 
   // スコア更新
   score += delta / 1000;
-  scoreEl.textContent = Math.floor(score);
+  const displayScore = Math.floor(score);
+  scoreEl.textContent = displayScore;
+
+  // クリア判定
+  if (score >= CLEAR_TIME) {
+    triggerClear();
+    return;
+  }
 
   // 難易度上昇
   enemySpeed += SPEED_INCREMENT * delta;
   spawnInterval = Math.max(
     MIN_SPAWN_INTERVAL,
-    INITIAL_SPAWN_INTERVAL - Math.floor(score) * SPAWN_DECREMENT * 60
+    INITIAL_SPAWN_INTERVAL - displayScore * SPAWN_DECREMENT * 60
   );
 
   // プレイヤー移動
@@ -180,12 +207,17 @@ function gameLoop(timestamp) {
 function triggerGameover() {
   state = 'gameover';
   cancelAnimationFrame(animFrameId);
-
   finalScoreEl.textContent = Math.floor(score);
-  randomMsgEl.textContent = GAME_OVER_MESSAGES[
-    Math.floor(Math.random() * GAME_OVER_MESSAGES.length)
-  ];
+  randomMsgEl.textContent = pickRandom(GAME_OVER_MESSAGES);
   showScreen('gameover');
+}
+
+// ---- クリア処理 ----
+function triggerClear() {
+  state = 'clear';
+  cancelAnimationFrame(animFrameId);
+  clearMsgEl.textContent = pickRandom(CLEAR_MESSAGES);
+  showScreen('clear');
 }
 
 // ---- ゲーム開始 ----
@@ -199,6 +231,7 @@ function startGame() {
 // ---- イベント: ボタン ----
 btnStart.addEventListener('click', startGame);
 btnRestart.addEventListener('click', startGame);
+btnClearRestart.addEventListener('click', startGame);
 
 // ---- イベント: キーボード ----
 document.addEventListener('keydown', e => {
