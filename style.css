@@ -6,14 +6,30 @@
 }
 
 body {
-  background: #1a1a2e;
+  background: #1a1a2e url('oji.png') center center / cover no-repeat fixed;
   font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif;
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
+  min-height: 100dvh;
   overflow: hidden;
   user-select: none;
+}
+
+/* 背景画像にオーバーレイをかけてコントラスト確保 */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 10, 30, 0.62);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.screen, #score-display {
+  position: relative;
+  z-index: 1;
 }
 
 /* ---- 画面管理 ---- */
@@ -92,7 +108,7 @@ body {
 /* ---- ゲーム画面 ---- */
 #screen-game {
   flex-direction: column;
-  background: #16213e;
+  background: transparent;
 }
 
 #score-display {
@@ -114,6 +130,7 @@ body {
   position: fixed;
   inset: 0;
   overflow: hidden;
+  z-index: 1;
 }
 
 /* ---- プレイヤー ---- */
@@ -148,7 +165,7 @@ body {
   top: 0;
   bottom: 0;
   width: 50%;
-  z-index: 20;
+  z-index: 21;
 }
 
 #touch-left  { left: 0; }
@@ -176,4 +193,32 @@ body {
   padding: 10px 16px;
   margin: 8px 0 24px;
   line-height: 1.6;
+}
+
+/* ---- クリア画面 ---- */
+.clear-title {
+  font-size: 30px;
+  color: #4cdf80;
+  margin-bottom: 8px;
+}
+
+.clear-message {
+  font-size: 16px;
+  color: #4cdf80;
+  background: rgba(76, 223, 128, 0.1);
+  border: 1px solid rgba(76, 223, 128, 0.35);
+  border-radius: 12px;
+  padding: 10px 16px;
+  margin: 8px 0 24px;
+  line-height: 1.6;
+}
+
+/* スマホ縦画面: セーフエリア対応 */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  #player {
+    bottom: calc(40px + env(safe-area-inset-bottom));
+  }
+  .screen-inner {
+    padding-bottom: calc(32px + env(safe-area-inset-bottom));
+  }
 }
