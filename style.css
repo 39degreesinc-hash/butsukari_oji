@@ -1,0 +1,179 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background: #1a1a2e;
+  font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  overflow: hidden;
+  user-select: none;
+}
+
+/* ---- 画面管理 ---- */
+.screen {
+  display: none;
+  position: fixed;
+  inset: 0;
+  justify-content: center;
+  align-items: center;
+}
+
+.screen.active {
+  display: flex;
+}
+
+.screen-inner {
+  text-align: center;
+  padding: 32px 24px;
+  background: #16213e;
+  border-radius: 24px;
+  border: 2px solid #0f3460;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  max-width: 360px;
+  width: 90%;
+}
+
+/* ---- スタート画面 ---- */
+.title {
+  font-size: clamp(22px, 5vw, 28px);
+  font-weight: bold;
+  color: #e94560;
+  line-height: 1.4;
+  margin-bottom: 16px;
+}
+
+.ojisan-demo {
+  font-size: 56px;
+  margin: 12px 0;
+  animation: bounce 1.2s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.description {
+  color: #a8b2c8;
+  font-size: 14px;
+  line-height: 1.8;
+  margin-bottom: 24px;
+}
+
+.description strong {
+  color: #e94560;
+}
+
+.btn-primary {
+  background: #e94560;
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  padding: 14px 40px;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.1s;
+  box-shadow: 0 4px 12px rgba(233, 69, 96, 0.4);
+}
+
+.btn-primary:active {
+  transform: scale(0.95);
+  box-shadow: 0 2px 6px rgba(233, 69, 96, 0.3);
+}
+
+/* ---- ゲーム画面 ---- */
+#screen-game {
+  flex-direction: column;
+  background: #16213e;
+}
+
+#score-display {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(15, 52, 96, 0.9);
+  color: #fff;
+  font-size: 20px;
+  font-weight: bold;
+  padding: 8px 20px;
+  border-radius: 50px;
+  z-index: 10;
+  border: 1px solid #0f3460;
+}
+
+#game-area {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+}
+
+/* ---- プレイヤー ---- */
+#player {
+  position: absolute;
+  bottom: 40px;
+  font-size: 36px;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translateX(-50%);
+  z-index: 5;
+}
+
+/* ---- 敵 ---- */
+.enemy {
+  position: absolute;
+  font-size: 32px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translateX(-50%);
+}
+
+/* ---- タッチゾーン ---- */
+.touch-zone {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  width: 50%;
+  z-index: 20;
+}
+
+#touch-left  { left: 0; }
+#touch-right { right: 0; }
+
+/* ---- ゲームオーバー画面 ---- */
+.gameover-title {
+  font-size: 32px;
+  color: #e94560;
+  margin-bottom: 8px;
+}
+
+.final-score {
+  font-size: 22px;
+  color: #fff;
+  margin: 12px 0;
+}
+
+.random-message {
+  font-size: 16px;
+  color: #f0c040;
+  background: rgba(240, 192, 64, 0.1);
+  border: 1px solid rgba(240, 192, 64, 0.3);
+  border-radius: 12px;
+  padding: 10px 16px;
+  margin: 8px 0 24px;
+  line-height: 1.6;
+}
