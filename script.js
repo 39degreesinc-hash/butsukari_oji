@@ -14,7 +14,7 @@ const MIN_SPAWN_INTERVAL = 400;
 
 const GAME_OVER_MESSAGES = [
   "はい、今日も理不尽",
-  "避けたのに来るタイプ",
+  "避けたのに来たよね？",
   "これは不可避",
   "ぶつかり専門学校でも出たん？",
   "明日はあなたがぶつかる番だ",
@@ -96,7 +96,7 @@ function spawnEnemy() {
 
   const el = document.createElement('div');
   el.className = 'enemy';
-  el.textContent = '🚶';
+  el.textContent = '👴';
   gameArea.appendChild(el);
 
   enemies.push({ x, y: -ENEMY_HEIGHT, el });
